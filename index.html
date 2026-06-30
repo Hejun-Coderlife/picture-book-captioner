@@ -12,18 +12,18 @@
   :root{
     --ink:#2a2118; --muted:#8c7f6c; --line:rgba(140,120,90,.22); --line2:rgba(140,120,90,.16);
     --accent:#bd5b3a; --accent-d:#a44a2d; --honey:#dca64a; --radius:18px;
-    --glass:rgba(255,252,244,.62); --glass-strong:rgba(255,252,244,.82);
+    --glass:rgba(255,252,244,.74); --glass-strong:rgba(255,252,244,.9);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{margin:0; color:var(--ink); font-family:"Hanken Grotesk", system-ui, sans-serif; overflow-x:hidden;
-    background:linear-gradient(160deg,#f7ecd8 0%, #f1e2c8 45%, #ecdcc0 100%); min-height:100vh}
+    background:linear-gradient(160deg,#0b1233 0%, #16204d 50%, #1d2c5a 100%); min-height:100vh}
   ::selection{background:rgba(189,91,58,.18)}
 
   /* WebGL 3D world behind everything */
   #bg{position:fixed; inset:0; width:100vw; height:100vh; z-index:0; display:block}
   .vignette{position:fixed; inset:0; z-index:1; pointer-events:none;
-    background:radial-gradient(125% 85% at 50% 28%, transparent 52%, rgba(60,38,18,.26))}
+    background:radial-gradient(125% 85% at 50% 30%, transparent 50%, rgba(6,10,30,.4))}
 
   /* ---- header (glass) ---- */
   header{position:relative; z-index:3; display:flex; align-items:center; gap:18px; flex-wrap:wrap; padding:16px 30px;
@@ -110,15 +110,11 @@
   #stage{position:relative; overflow:hidden; border-radius:var(--radius); min-height:calc(100vh - 150px);
     display:flex; align-items:center; justify-content:center; padding:52px; perspective:1700px; perspective-origin:50% 40%;
     background:linear-gradient(160deg, rgba(255,250,240,.5), rgba(236,226,207,.35)); box-shadow:inset 0 2px 18px rgba(74,52,30,.16)}
-  .book{position:relative; z-index:1; transform-style:preserve-3d; will-change:transform; animation:fadeIn .5s ease both; transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)); transition:transform .2s cubic-bezier(.2,.7,.2,1)}
+  #stage canvas{display:block; max-width:100%; max-height:calc(100vh - 200px); width:auto; height:auto; border-radius:6px;
+    box-shadow:0 26px 60px -24px rgba(40,25,10,.6), 0 0 0 1px rgba(255,255,255,.5); animation:fadeIn .4s ease both}
   @keyframes fadeIn{from{opacity:0} to{opacity:1}}
-  .leaf{transform-style:preserve-3d; animation:float 7s ease-in-out infinite}
-  @keyframes float{0%,100%{transform:translateY(0) rotateZ(-.15deg)} 50%{transform:translateY(-7px) rotateZ(.15deg)}}
-  .book canvas{display:block; max-width:100%; max-height:calc(100vh - 250px); width:auto; height:auto; border-radius:4px 11px 11px 4px;
-    box-shadow:-2px 0 0 #efe7d6,-4px 0 0 #e9dfc9,-7px 1px 0 #e0d4ba,-10px 2px 0 #d7cab0,-13px 3px 0 #cdbfa2,-16px 4px 0 #c4b596,0 40px 70px -22px rgba(40,25,10,.7),0 0 0 1px rgba(255,255,255,.5)}
-  .glare{position:absolute; inset:0; border-radius:4px 11px 11px 4px; pointer-events:none; mix-blend-mode:screen; opacity:0; transition:opacity .25s}
   .empty{text-align:center; color:var(--muted); z-index:1}
-  .empty svg{width:76px; height:76px; opacity:.6; margin-bottom:14px; animation:float 7s ease-in-out infinite}
+  .empty svg{width:76px; height:76px; opacity:.6; margin-bottom:14px}
   .empty p{margin:0; font-family:"Fraunces",serif; font-style:italic; font-size:16px}
   .empty span{display:block; font-style:normal; font-size:12.5px; margin-top:4px; opacity:.8}
 
@@ -199,59 +195,65 @@
 </div>
 
 <script>
-/* ====================== 3D WORLD (Three.js) ====================== */
+/* ============ Animated "The Starry Night" background (WebGL shader) ============ */
 function initScene(){
   const canvas = document.getElementById("bg");
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true });
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0xf0e3c9, 0.034);
-  const camera = new THREE.PerspectiveCamera(56, innerWidth/innerHeight, 0.1, 100);
-  camera.position.set(0,0,15);
+  const camera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
 
-  scene.add(new THREE.AmbientLight(0xfff1dd, 0.95));
-  const dir = new THREE.DirectionalLight(0xffe6c0, 1.15); dir.position.set(6,9,7); scene.add(dir);
-  const p1 = new THREE.PointLight(0xbd5b3a, 1.3, 45); p1.position.set(-9,-4,7); scene.add(p1);
-  const p2 = new THREE.PointLight(0xdca64a, 1.0, 45); p2.position.set(10,6,-2); scene.add(p2);
+  const uniforms = {
+    uTex:{ value:null }, uHasTex:{ value:0 }, uTime:{ value:0 },
+    uImgAspect:{ value:1.26 }, uScreenAspect:{ value:innerWidth/innerHeight }
+  };
+  const material = new THREE.ShaderMaterial({
+    uniforms,
+    vertexShader: "varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position,1.0); }",
+    fragmentShader: `
+      precision highp float;
+      varying vec2 vUv;
+      uniform sampler2D uTex; uniform float uTime,uImgAspect,uScreenAspect,uHasTex;
+      float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+      float noise(vec2 p){ vec2 i=floor(p),f=fract(p); f=f*f*(3.0-2.0*f);
+        float a=hash(i),b=hash(i+vec2(1.0,0.0)),c=hash(i+vec2(0.0,1.0)),d=hash(i+vec2(1.0,1.0));
+        return mix(mix(a,b,f.x),mix(c,d,f.x),f.y); }
+      void main(){
+        vec2 s = uScreenAspect>uImgAspect ? vec2(1.0,uImgAspect/uScreenAspect) : vec2(uScreenAspect/uImgAspect,1.0);
+        vec2 uv = (vUv-0.5)*s+0.5;                 // cover-fit
+        float t = uTime*0.05;
+        // gentle flowing brushstroke displacement (small -> stays sharp)
+        vec2 q  = vec2(noise(uv*3.0+vec2(0.0,t)),     noise(uv*3.0+vec2(t,5.2)))   - 0.5;
+        vec2 q2 = vec2(noise(uv*6.0-vec2(t*1.3,1.0)), noise(uv*6.0+vec2(2.0,t*1.1)))- 0.5;
+        vec2 disp = q*0.011 + q2*0.005;
+        vec2 suv = clamp(uv+disp, 0.0015, 0.9985);
+        vec3 col;
+        if(uHasTex>0.5) col = texture2D(uTex, suv).rgb;
+        else col = mix(vec3(0.05,0.08,0.22), vec3(0.10,0.17,0.40), suv.y);
+        // star twinkle on the bright spots
+        float lum = dot(col, vec3(0.299,0.587,0.114));
+        float tw  = smoothstep(0.6,0.95,lum) * (0.5+0.5*sin(uTime*1.8 + suv.x*42.0 + suv.y*42.0));
+        col += tw*0.18*vec3(1.0,0.92,0.6);
+        gl_FragColor = vec4(col,1.0);
+      }`
+  });
+  scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), material));
 
-  const palette = [0xbd5b3a,0xdca64a,0x7a9c74,0x5a799b,0xc9a227,0xb5532f,0xe7dcc4,0xcf6a45];
-  const books = [], group = new THREE.Group(); scene.add(group);
-  for (let i=0;i<18;i++){
-    const w = 1+Math.random()*1.3, h = 1.4+Math.random()*1.5, d = 0.16+Math.random()*0.22;
-    const m = new THREE.MeshStandardMaterial({ color: palette[i%palette.length], roughness:0.72, metalness:0.05 });
-    const mesh = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), m);
-    mesh.position.set((Math.random()-.5)*24,(Math.random()-.5)*15,(Math.random()-.5)*11 - 2);
-    mesh.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
-    mesh.userData = { ax: new THREE.Vector3(Math.random()-.5,Math.random()-.5,Math.random()-.5).normalize(),
-                      sp: 0.06+Math.random()*0.22, ph: Math.random()*6.28, by: 0.3+Math.random()*0.5,
-                      y0: mesh.position.y };
-    group.add(mesh); books.push(mesh);
-  }
+  const IMG = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/2560px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg";
+  const loader = new THREE.TextureLoader(); loader.setCrossOrigin("anonymous");
+  loader.load(IMG, tx => {
+    tx.minFilter = THREE.LinearFilter; tx.magFilter = THREE.LinearFilter;
+    tx.generateMipmaps = false; tx.wrapS = tx.wrapT = THREE.ClampToEdgeWrapping;
+    uniforms.uTex.value = tx; uniforms.uHasTex.value = 1;
+    if (tx.image && tx.image.width) uniforms.uImgAspect.value = tx.image.width / tx.image.height;
+  }, undefined, err => console.warn("Starry Night image failed; using gradient fallback", err));
 
-  const N = 520, pos = new Float32Array(N*3);
-  for (let i=0;i<N;i++){ pos[i*3]=(Math.random()-.5)*44; pos[i*3+1]=(Math.random()-.5)*28; pos[i*3+2]=(Math.random()-.5)*22-2; }
-  const pg = new THREE.BufferGeometry(); pg.setAttribute("position", new THREE.BufferAttribute(pos,3));
-  const points = new THREE.Points(pg, new THREE.PointsMaterial({ color:0xffe9c2, size:0.09, transparent:true, opacity:0.85, blending:THREE.AdditiveBlending, depthWrite:false }));
-  scene.add(points);
-
-  let tx=0, ty=0, mx=0, my=0;
-  addEventListener("pointermove", e => { tx = e.clientX/innerWidth - .5; ty = e.clientY/innerHeight - .5; });
-  function resize(){ camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); }
+  function resize(){ uniforms.uScreenAspect.value = innerWidth/innerHeight; renderer.setSize(innerWidth, innerHeight); }
   addEventListener("resize", resize); resize();
-
   const clock = new THREE.Clock();
-  (function loop(){
-    const t = clock.getElapsedTime();
-    mx += (tx-mx)*0.045; my += (ty-my)*0.045;
-    camera.position.x = mx*4.5; camera.position.y = -my*3.2; camera.lookAt(0,0,0);
-    for (const b of books){ b.rotateOnAxis(b.userData.ax, b.userData.sp*0.012); b.position.y = b.userData.y0 + Math.sin(t*b.userData.by + b.userData.ph)*0.45; }
-    group.rotation.y = Math.sin(t*0.05)*0.06;
-    points.rotation.y = t*0.018;
-    renderer.render(scene, camera);
-    requestAnimationFrame(loop);
-  })();
+  (function loop(){ uniforms.uTime.value = clock.getElapsedTime(); renderer.render(scene, camera); requestAnimationFrame(loop); })();
 }
-if (window.THREE) { try { initScene(); } catch(e){ console.warn("3D scene disabled:", e); } }
+if (window.THREE) { try { initScene(); } catch(e){ console.warn("background disabled:", e); } }
 
 /* ====================== TOOL ====================== */
 const $ = id => document.getElementById(id);
@@ -344,32 +346,11 @@ function renderPage(p,index){
   for (const ln of lines){ ctx.fillText(ln,tx,y); y+=lineH; }
   if ($("pageOn").checked){ ctx.font=`bold ${fontPx*0.8}px ${$("font").value}`; ctx.fillStyle="#a9772f"; ctx.textAlign="right"; ctx.textBaseline="alphabetic"; ctx.fillText(String(index+1), panelX+panelW-padX*0.6, panelY+panelH-padBottom*0.5); }
 }
-function mountBook(){
-  const stage=$("stage"); let book=stage.querySelector(".book");
-  if (!book){ stage.innerHTML="";
-    book=document.createElement("div"); book.className="book";
-    const leaf=document.createElement("div"); leaf.className="leaf";
-    const glare=document.createElement("div"); glare.className="glare";
-    leaf.appendChild(canvas); leaf.appendChild(glare); book.appendChild(leaf); stage.appendChild(book);
-  }
+function mountCanvas(){
+  const stage=$("stage");
+  if (stage.firstChild !== canvas){ stage.innerHTML=""; stage.appendChild(canvas); }
 }
-function draw(){ if (cur<0) return; renderPage(pages[cur],cur); mountBook(); }
-
-(function tilt(){
-  const stage=$("stage"); const MAX=7;
-  stage.addEventListener("pointermove", e => {
-    const book=stage.querySelector(".book"); if (!book) return;
-    const r=stage.getBoundingClientRect(); const px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
-    book.style.setProperty("--ry", ((px-.5)*MAX*2).toFixed(2)+"deg");
-    book.style.setProperty("--rx", ((.5-py)*MAX*2).toFixed(2)+"deg");
-    const g=book.querySelector(".glare"); if (g){ g.style.opacity=".6"; g.style.background=`radial-gradient(circle at ${(px*100).toFixed(0)}% ${(py*100).toFixed(0)}%, rgba(255,255,255,.55), rgba(255,255,255,0) 46%)`; }
-  });
-  stage.addEventListener("pointerleave", () => {
-    const book=stage.querySelector(".book"); if (!book) return;
-    book.style.setProperty("--rx","0deg"); book.style.setProperty("--ry","0deg");
-    const g=book.querySelector(".glare"); if (g) g.style.opacity="0";
-  });
-})();
+function draw(){ if (cur<0) return; renderPage(pages[cur],cur); mountCanvas(); }
 
 function download(blob,name){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
 $("dlOne").onclick = () => { if (cur<0) return; renderPage(pages[cur],cur); canvas.toBlob(b=>download(b,`page${cur+1}.png`),"image/png"); };
