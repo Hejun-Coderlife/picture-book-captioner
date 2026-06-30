@@ -46,10 +46,10 @@
   .pill{font-size:12px; font-weight:600; color:var(--accent-d); background:rgba(189,91,58,.12); border:1px solid rgba(189,91,58,.28); padding:5px 11px; border-radius:999px}
 
   /* ---- layout with depth ---- */
-  .app{position:relative; z-index:2; display:flex; gap:22px; padding:26px 30px; align-items:flex-start; max-width:1500px; margin:0 auto; perspective:1600px}
-  .left{width:372px; flex:none; padding:6px 22px 22px; animation:rise .7s ease both; transform:translateZ(40px)}
-  .right{flex:1; min-width:0; padding:0; animation:rise .7s .08s ease both; transform:translateZ(14px)}
-  @keyframes rise{from{opacity:0; transform:translateY(18px)} to{opacity:1}}
+  .app{position:relative; z-index:2; display:flex; gap:22px; padding:26px 30px; align-items:flex-start; max-width:1500px; margin:0 auto}
+  .left{width:372px; flex:none; padding:6px 22px 22px; animation:rise .7s ease both}
+  .right{flex:1; min-width:0; padding:0; animation:rise .7s .08s ease both}
+  @keyframes rise{from{opacity:0; transform:translateY(18px)} to{opacity:1; transform:none}}
   .card{background:var(--glass); backdrop-filter:blur(20px) saturate(1.5); -webkit-backdrop-filter:blur(20px) saturate(1.5);
     border:1px solid rgba(255,255,255,.5); border-radius:var(--radius);
     box-shadow:0 30px 70px -28px rgba(50,32,14,.6), 0 2px 0 rgba(255,255,255,.4) inset}
