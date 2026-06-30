@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <style>
   :root{
     --ink:#3a2e22; --muted:#9a8975; --faint:#bcae98;
@@ -17,23 +18,18 @@
   }
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{margin:0; color:var(--ink); font-family:"Hanken Grotesk",system-ui,sans-serif; overflow-x:hidden;
+  body{margin:0; color:var(--ink); font-family:"Hanken Grotesk",system-ui,sans-serif;
+    height:100vh; overflow:hidden; display:flex; flex-direction:column;
     background:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
       radial-gradient(1100px 700px at 50% -20%, rgba(255,250,235,.55), transparent 60%),
       radial-gradient(1000px 520px at 85% -10%, #fbf3e0, transparent 60%),
       radial-gradient(840px 470px at -10% 110%, #f6ecd4, transparent 55%),
-      var(--paper);
-    background-attachment:fixed; min-height:100vh}
+      var(--paper)}
   ::selection{background:rgba(189,91,58,.16)}
+  #bg{position:fixed; inset:0; width:100vw; height:100vh; z-index:0; pointer-events:none}
 
-  /* gentle floating warm dust */
-  .motes{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden}
-  .mote{position:absolute; bottom:-12px; border-radius:50%; background:radial-gradient(circle,#ffe2b0,rgba(255,226,176,0)); opacity:0; animation:drift linear infinite}
-  @keyframes drift{0%{transform:translateY(0) scale(.6); opacity:0} 14%{opacity:.6} 86%{opacity:.5} 100%{transform:translateY(-104vh) scale(1.15); opacity:0}}
-
-  /* ---------- header ---------- */
-  header{position:relative; z-index:3; display:flex; align-items:center; gap:15px; flex-wrap:wrap; padding:18px 34px;
+  header{position:relative; z-index:3; flex:none; display:flex; align-items:center; gap:15px; flex-wrap:wrap; padding:18px 34px;
     background:linear-gradient(180deg,#fffdf8,#fbf4e6); border-bottom:1px solid var(--line)}
   header::after{content:""; position:absolute; left:0; right:0; bottom:-1px; height:1px;
     background:linear-gradient(90deg,transparent,rgba(189,91,58,.45) 30%,rgba(199,154,85,.45) 70%,transparent)}
@@ -51,13 +47,18 @@
   .pills{margin-left:auto; display:flex; gap:8px; flex-wrap:wrap}
   .pill{font-size:11px; font-weight:600; letter-spacing:.3px; color:var(--accent-d); padding:5px 12px; border-radius:999px; border:1px solid rgba(189,91,58,.28); background:rgba(189,91,58,.08)}
 
-  /* ---------- layout ---------- */
-  .app{position:relative; z-index:2; display:flex; gap:22px; padding:26px 34px; align-items:flex-start; max-width:1500px; margin:0 auto}
-  .left{width:380px; flex:none; padding:6px 24px 24px; animation:rise .65s cubic-bezier(.2,.7,.2,1) both}
-  .right{flex:1; min-width:0; padding:0; animation:rise .65s .07s cubic-bezier(.2,.7,.2,1) both}
+  .app{position:relative; z-index:2; flex:1; min-height:0; width:100%; display:flex; gap:22px; padding:24px 34px; align-items:stretch; max-width:1500px; margin:0 auto}
+  .left{width:380px; flex:none; height:100%; overflow:hidden; display:flex; flex-direction:column; animation:rise .65s cubic-bezier(.2,.7,.2,1) both}
+  .right{flex:1; min-width:0; min-height:0; height:100%; animation:rise .65s .07s cubic-bezier(.2,.7,.2,1) both}
   @keyframes rise{from{opacity:0; transform:translateY(15px)} to{opacity:1; transform:none}}
   .card{position:relative; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:0 16px 40px -22px rgba(80,50,20,.45)}
-  .card.left::after{content:""; position:absolute; inset:9px; border:1px solid rgba(189,91,58,.14); border-radius:13px; pointer-events:none}
+  .card.left::after{content:""; position:absolute; inset:9px; border:1px solid rgba(189,91,58,.14); border-radius:13px; pointer-events:none; z-index:2}
+
+  /* left scrolls inside its frame */
+  .scroll{flex:1; min-height:0; overflow-y:auto; padding:6px 24px 24px; scrollbar-width:thin; scrollbar-color:var(--honey) transparent}
+  .scroll::-webkit-scrollbar{width:9px}
+  .scroll::-webkit-scrollbar-thumb{background:rgba(199,154,85,.55); border-radius:9px; border:2px solid var(--card)}
+  .scroll::-webkit-scrollbar-thumb:hover{background:var(--honey)}
 
   section{padding:20px 0; position:relative}
   section + section{margin-top:4px}
@@ -119,24 +120,31 @@
   .thumb .n{position:absolute; bottom:0; left:0; right:0; background:rgba(40,25,10,.6); color:#fff; font-size:10px; text-align:center; font-weight:600}
   .foot{margin-top:18px; padding-top:15px; font-size:12px; color:var(--muted); line-height:1.65; border-top:1px dashed var(--line2)}
 
-  #stage{position:relative; overflow:hidden; border-radius:var(--radius); min-height:calc(100vh - 150px); display:flex; align-items:center; justify-content:center; padding:50px;
+  #stage{position:relative; overflow:hidden; height:100%; border-radius:var(--radius); display:flex; align-items:center; justify-content:center; padding:46px;
     background:radial-gradient(900px 500px at 50% 0%,#fbf4e6,transparent 70%), repeating-linear-gradient(45deg,#efe6d4 0 2px,transparent 2px 22px), #ece2cf;
     box-shadow:inset 0 2px 16px rgba(74,52,30,.14)}
   .plate{position:relative; background:#fffdf6; padding:16px; border-radius:8px; animation:fadeIn .45s ease both;
     box-shadow:0 32px 66px -26px rgba(60,40,15,.62), 0 2px 8px -3px rgba(60,40,15,.3)}
   .plate::before{content:""; position:absolute; inset:8px; border:1px solid rgba(199,154,85,.55); border-radius:4px; pointer-events:none; z-index:1}
-  .plate canvas{display:block; max-width:100%; max-height:calc(100vh - 232px); width:auto; height:auto; border-radius:2px; box-shadow:0 0 0 1px rgba(60,40,15,.08)}
+  .plate canvas{display:block; max-width:100%; max-height:calc(100vh - 244px); width:auto; height:auto; border-radius:2px; box-shadow:0 0 0 1px rgba(60,40,15,.08)}
   @keyframes fadeIn{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
   .empty{text-align:center; color:var(--muted)}
   .empty svg{width:74px; height:74px; opacity:.6; margin-bottom:14px}
   .empty p{margin:0; font-family:"Fraunces",serif; font-style:italic; font-size:17px; color:var(--ink)}
   .empty span{display:block; font-size:12.5px; margin-top:5px}
 
-  @media(max-width:880px){.app{flex-direction:column}.left{width:100%}.right{width:100%}#stage{min-height:340px}}
+  @media(max-width:880px){
+    body{height:auto; overflow:auto; display:block}
+    .app{flex-direction:column; height:auto}
+    .left{width:100%; height:auto; overflow:visible}
+    .scroll{overflow:visible; min-height:0}
+    .right{width:100%; height:auto}
+    #stage{height:auto; min-height:340px}
+  }
 </style>
 </head>
 <body>
-<div class="motes" id="motes"></div>
+<canvas id="bg"></canvas>
 
 <header>
   <div class="brand">
@@ -149,6 +157,7 @@
 
 <div class="app">
   <div class="card left">
+   <div class="scroll">
     <section>
       <h2><span class="num">1</span> Add images</h2>
       <div id="drop"><span class="ic">🖼️</span>Drag images here, or click to choose<br><span style="opacity:.7">multiple files welcome</span></div>
@@ -200,6 +209,7 @@
       </div>
       <p class="foot">Everything runs locally in your browser — images are never uploaded, nothing leaves your computer, zero cost. Make as many books as you like.</p>
     </section>
+   </div>
   </div>
 
   <div class="card right">
@@ -208,11 +218,42 @@
 </div>
 
 <script>
-/* floating warm dust */
-(function(){ const m=document.getElementById("motes");
-  for(let i=0;i<16;i++){ const s=document.createElement("span"); s.className="mote"; const sz=4+(i%4)*3;
-    s.style.left=((i*61)%100)+"%"; s.style.width=s.style.height=sz+"px";
-    s.style.animationDuration=(13+(i%5)*4)+"s"; s.style.animationDelay=(-i*1.6)+"s"; m.appendChild(s);} })();
+/* ===== warm 3D background: floating light-dust + drifting pages ===== */
+function initScene(){
+  const canvas=document.getElementById("bg");
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,120); camera.position.z=18;
+  scene.add(new THREE.AmbientLight(0xfff1de,1.05));
+  const dir=new THREE.DirectionalLight(0xffe9c8,0.7); dir.position.set(5,8,6); scene.add(dir);
+
+  const cv=document.createElement("canvas"); cv.width=cv.height=128; const g=cv.getContext("2d");
+  const rg=g.createRadialGradient(64,64,0,64,64,64); rg.addColorStop(0,"rgba(255,255,255,1)"); rg.addColorStop(.25,"rgba(255,255,255,.82)"); rg.addColorStop(1,"rgba(255,255,255,0)");
+  g.fillStyle=rg; g.fillRect(0,0,128,128); const tex=new THREE.CanvasTexture(cv);
+  const pal=[0xffe6c2,0xffd9b0,0xf6c9a0,0xe7b894,0xfff2d8,0xffffff], orbs=[];
+  function add(n,za,zb,sa,sb,oa,ob){for(let i=0;i<n;i++){const m=new THREE.SpriteMaterial({map:tex,color:pal[(Math.random()*pal.length)|0],transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});const s=new THREE.Sprite(m);const z=za+Math.random()*(zb-za);s.position.set((Math.random()-.5)*54,(Math.random()-.5)*34,z);const k=sa+Math.random()*(sb-sa)+(-z)*.05;s.scale.set(k,k,1);s.userData={b:oa+Math.random()*(ob-oa),ph:Math.random()*6.28,tw:.25+Math.random()*.5,dr:.12+Math.random()*.4,x:s.position.x,y:s.position.y};scene.add(s);orbs.push(s);}}
+  add(46,-26,-2,.8,3,.12,.4); add(7,-40,-28,7,13,.05,.13);
+
+  const pPal=[0xfff7ea,0xf3dcc0,0xe8c9a6,0xf6e3c8], leaves=[];
+  for(let i=0;i<9;i++){
+    const m=new THREE.MeshStandardMaterial({color:pPal[i%pPal.length],roughness:.9,metalness:0,transparent:true,opacity:0.20,side:THREE.DoubleSide});
+    const mesh=new THREE.Mesh(new THREE.BoxGeometry(2.0,2.7,0.05),m);
+    mesh.position.set((Math.random()-.5)*42,(Math.random()-.5)*24,-6-Math.random()*16);
+    mesh.rotation.set(Math.random()*6,Math.random()*6,Math.random()*6);
+    mesh.userData={ax:new THREE.Vector3(Math.random()-.5,Math.random()-.5,Math.random()-.5).normalize(),sp:.05+Math.random()*.12,ph:Math.random()*6.28,dr:.2+Math.random()*.4,y0:mesh.position.y};
+    scene.add(mesh); leaves.push(mesh);
+  }
+
+  let TX=0,TY=0,MX=0,MY=0; addEventListener("pointermove",e=>{TX=e.clientX/innerWidth-.5;TY=e.clientY/innerHeight-.5;});
+  function rz(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);} addEventListener("resize",rz); rz();
+  const ck=new THREE.Clock();
+  (function lp(){const t=ck.getElapsedTime(); MX+=(TX-MX)*.04; MY+=(TY-MY)*.04; camera.position.x=MX*5; camera.position.y=-MY*3.5; camera.lookAt(0,0,-8);
+    for(const o of orbs){const u=o.userData;o.material.opacity=u.b*(.55+.45*Math.sin(t*u.tw+u.ph));o.position.y=u.y+Math.sin(t*u.dr+u.ph)*1.3;o.position.x=u.x+Math.cos(t*u.dr*.7+u.ph);}
+    for(const p of leaves){const u=p.userData;p.rotateOnAxis(u.ax,u.sp*0.01);p.position.y=u.y0+Math.sin(t*u.dr+u.ph)*1.0;}
+    renderer.render(scene,camera); requestAnimationFrame(lp);})();
+}
+if(window.THREE){ try{ initScene(); }catch(e){ console.warn("bg disabled",e); } }
 
 /* ===================== Tool ===================== */
 const $ = id => document.getElementById(id);
