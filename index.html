@@ -9,92 +9,88 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#f4eede;
-    --card:#fffdf7;
-    --ink:#2a2118;
-    --muted:#8c7f6c;
-    --line:#e7ddca;
-    --line2:#efe7d6;
-    --accent:#bd5b3a;       /* terracotta */
-    --accent-d:#a44a2d;
-    --honey:#dca64a;
-    --field:#fbf7ee;
-    --shadow:0 10px 30px -12px rgba(74,52,30,.28);
-    --radius:16px;
+    --paper:#f4eede; --card:#fffdf7; --ink:#2a2118; --muted:#8c7f6c;
+    --line:#e7ddca; --line2:#efe7d6; --accent:#bd5b3a; --accent-d:#a44a2d;
+    --honey:#dca64a; --field:#fbf7ee; --shadow:0 10px 30px -12px rgba(74,52,30,.28); --radius:16px;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0; color:var(--ink);
-    font-family:"Hanken Grotesk", system-ui, sans-serif;
+    margin:0; color:var(--ink); font-family:"Hanken Grotesk", system-ui, sans-serif; overflow-x:hidden;
     background:
       radial-gradient(1200px 600px at 85% -10%, #fbf3e3 0%, rgba(251,243,227,0) 60%),
-      radial-gradient(900px 500px at -10% 110%, #f6ecd8 0%, rgba(246,236,216,0) 55%),
-      var(--paper);
+      radial-gradient(900px 500px at -10% 110%, #f6ecd8 0%, rgba(246,236,216,0) 55%), var(--paper);
     background-attachment:fixed;
   }
   ::selection{background:rgba(189,91,58,.18)}
 
   /* ---- header ---- */
-  header{
-    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
-    padding:18px 28px; border-bottom:1px solid var(--line);
-    background:linear-gradient(180deg,#fffdf8,#fbf4e6);
-  }
-  .brand{display:flex; align-items:baseline; gap:12px}
-  .mark{
-    font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:26px; letter-spacing:.2px;
-    color:var(--ink); line-height:1;
-  }
+  header{display:flex; align-items:center; gap:18px; flex-wrap:wrap; padding:16px 28px;
+    border-bottom:1px solid var(--line); background:linear-gradient(180deg,#fffdf8,#fbf4e6); position:relative; z-index:5}
+  .brand{display:flex; align-items:center; gap:14px}
+  .logo-wrap{perspective:340px; width:38px; height:46px; flex:none}
+  .logo{width:100%; height:100%; position:relative; transform-style:preserve-3d;
+    transform:rotateY(-26deg) rotateX(7deg); transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+  .logo-wrap:hover .logo{transform:rotateY(20deg) rotateX(5deg)}
+  .logo .cover{position:absolute; inset:0; border-radius:3px 6px 6px 3px;
+    background:linear-gradient(135deg,#cf6a45,var(--accent-d)); box-shadow:inset -7px 0 10px -6px rgba(0,0,0,.35), 0 6px 14px -6px rgba(164,74,45,.7)}
+  .logo .cover::after{content:"❉"; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:rgba(255,240,220,.85); font-size:16px}
+  .logo .spine{position:absolute; left:-5px; top:1px; bottom:1px; width:6px; background:var(--accent-d);
+    transform-origin:right; transform:rotateY(78deg); border-radius:2px 0 0 2px}
+  .logo .edge{position:absolute; right:-4px; top:3px; bottom:3px; width:5px; transform-origin:left; transform:rotateY(-78deg);
+    background:repeating-linear-gradient(#fffdf6 0 1px,#e7dcc6 1px 2px)}
+  .mark{font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:25px; letter-spacing:.2px; color:var(--ink); line-height:1}
   .mark .dot{color:var(--accent)}
   .sub{font-style:italic; font-family:"Fraunces",serif; color:var(--muted); font-size:14px}
   .pills{display:flex; gap:8px; margin-left:auto; flex-wrap:wrap}
-  .pill{
-    font-size:12px; font-weight:600; color:var(--accent-d);
-    background:rgba(189,91,58,.09); border:1px solid rgba(189,91,58,.22);
-    padding:5px 11px; border-radius:999px;
-  }
+  .pill{font-size:12px; font-weight:600; color:var(--accent-d); background:rgba(189,91,58,.09);
+    border:1px solid rgba(189,91,58,.22); padding:5px 11px; border-radius:999px}
 
   /* ---- layout ---- */
   .app{display:flex; gap:22px; padding:24px 28px; align-items:flex-start; max-width:1500px; margin:0 auto}
-  .left{width:372px; flex:none}
-  .right{flex:1; min-width:0; position:sticky; top:24px}
+  .left{width:372px; flex:none; padding:6px 22px 22px; animation:rise .6s ease both}
+  .right{flex:1; min-width:0; position:sticky; top:24px; padding:0; animation:rise .6s .08s ease both}
   .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow)}
-  .left{padding:6px 22px 22px}
+  @keyframes rise{from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:none}}
 
   /* ---- sections ---- */
   section{padding:18px 0; border-top:1px dashed var(--line2)}
   section:first-of-type{border-top:0}
   h2{display:flex; align-items:center; gap:10px; margin:0 0 14px; font-size:15px; font-weight:600; color:var(--ink); font-family:"Fraunces",serif}
-  .num{
-    flex:none; width:24px; height:24px; border-radius:50%;
-    background:var(--accent); color:#fff; font:600 13px/24px "Hanken Grotesk",sans-serif;
-    text-align:center; box-shadow:0 2px 6px rgba(189,91,58,.35);
-  }
+  .num{flex:none; width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff;
+    font:600 13px/24px "Hanken Grotesk",sans-serif; text-align:center; box-shadow:0 2px 6px rgba(189,91,58,.35)}
 
   label{display:block; font-size:12px; color:var(--muted); margin:12px 0 5px; font-weight:600; letter-spacing:.2px}
-  textarea,select{
-    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:11px;
-    font-size:14px; font-family:inherit; color:var(--ink); background:var(--field);
-    transition:border-color .15s, box-shadow .15s;
-  }
+  textarea,select{width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:11px;
+    font-size:14px; font-family:inherit; color:var(--ink); background:var(--field); transition:border-color .15s, box-shadow .15s}
   textarea{min-height:104px; resize:vertical; line-height:1.55}
   textarea:focus,select:focus{outline:0; border-color:var(--accent); box-shadow:0 0 0 3px rgba(189,91,58,.14)}
-  select{appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M3 4.5L6 8l3-3.5' fill='none' stroke='%238c7f6c' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; cursor:pointer}
+  select{appearance:none; cursor:pointer; padding-right:32px; background-repeat:no-repeat; background-position:right 12px center;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M3 4.5L6 8l3-3.5' fill='none' stroke='%238c7f6c' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>")}
 
-  /* sliders */
-  .slider{display:flex; align-items:center; gap:12px; margin:9px 0}
+  /* sliders — custom gradient fill */
+  .slider{display:flex; align-items:center; gap:12px; margin:10px 0}
   .slider .lab{flex:none; width:74px; font-size:12.5px; color:var(--muted); font-weight:600}
-  .slider input[type=range]{flex:1; accent-color:var(--accent); height:4px; cursor:pointer}
-  .slider .val{flex:none; width:46px; text-align:right; font-variant-numeric:tabular-nums; font-size:13px; color:var(--ink); font-weight:600}
+  .slider input[type=range]{flex:1; -webkit-appearance:none; appearance:none; height:6px; border-radius:6px; cursor:pointer;
+    background:linear-gradient(var(--accent),var(--accent)) no-repeat, var(--line2);
+    background-size:var(--p,50%) 100%, 100% 100%;}
+  .slider input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:18px; height:18px; border-radius:50%;
+    background:#fff; border:2px solid var(--accent); box-shadow:0 2px 6px rgba(164,74,45,.45); transition:transform .1s}
+  .slider input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+  .slider input[type=range]::-moz-range-thumb{width:16px; height:16px; border-radius:50%; background:#fff; border:2px solid var(--accent)}
+  .slider .val{flex:none; min-width:46px; text-align:center; font-variant-numeric:tabular-nums; font-size:12.5px; color:var(--accent-d);
+    font-weight:700; background:rgba(189,91,58,.1); border-radius:7px; padding:3px 0}
+
+  /* segmented align */
+  .seg{display:flex; gap:4px; background:var(--field); border:1px solid var(--line); border-radius:11px; padding:4px}
+  .seg button{flex:1; padding:8px; border:0; border-radius:8px; background:transparent; color:var(--muted); font-weight:600; font-size:13px}
+  .seg button.on{background:#fff; color:var(--accent-d); box-shadow:0 1px 4px rgba(0,0,0,.1)}
 
   /* colors */
   .colors{display:grid; grid-template-columns:1fr 1fr; gap:12px 14px; margin-top:6px}
   .swatch{display:flex; align-items:center; gap:9px; font-size:13px; color:var(--ink); cursor:pointer}
-  input[type=color]{
-    width:30px; height:30px; padding:0; border:2px solid #fff; border-radius:50%;
-    box-shadow:0 0 0 1px var(--line), 0 2px 5px rgba(0,0,0,.12); cursor:pointer; background:none;
-  }
+  input[type=color]{width:30px; height:30px; padding:0; border:2px solid #fff; border-radius:50%;
+    box-shadow:0 0 0 1px var(--line), 0 2px 5px rgba(0,0,0,.12); cursor:pointer; background:none}
   input[type=color]::-webkit-color-swatch-wrapper{padding:0}
   input[type=color]::-webkit-color-swatch{border:0; border-radius:50%}
   .check{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink); cursor:pointer}
@@ -104,68 +100,75 @@
   .btns{display:flex; gap:10px; margin-top:18px}
   button{font-family:inherit; font-weight:600; font-size:14px; border-radius:12px; cursor:pointer; transition:transform .08s, box-shadow .15s, background .15s}
   button:active{transform:translateY(1px)}
-  .primary{flex:1; padding:12px; border:0; color:#fff; background:linear-gradient(180deg,var(--accent),var(--accent-d)); box-shadow:0 6px 16px -6px rgba(164,74,45,.7)}
-  .primary:hover{box-shadow:0 9px 20px -6px rgba(164,74,45,.8)}
+  .primary{flex:1; padding:12px; border:0; color:#fff; background:linear-gradient(180deg,#cf6a45,var(--accent-d));
+    box-shadow:0 7px 16px -6px rgba(164,74,45,.75), inset 0 1px 0 rgba(255,255,255,.25)}
+  .primary:hover{box-shadow:0 11px 22px -6px rgba(164,74,45,.85)}
   .ghost{flex:1; padding:12px; border:1px solid var(--line); background:#fff; color:var(--ink)}
   .ghost:hover{border-color:var(--accent); color:var(--accent-d)}
 
-  /* drop zone + thumbs */
-  #drop{
-    border:1.5px dashed #d8ccb3; border-radius:13px; padding:24px 16px; text-align:center;
-    color:var(--muted); cursor:pointer; background:var(--field); transition:.15s; font-size:13.5px;
-  }
+  /* drop + thumbs */
+  #drop{border:1.5px dashed #d8ccb3; border-radius:13px; padding:24px 16px; text-align:center; color:var(--muted);
+    cursor:pointer; background:var(--field); transition:.15s; font-size:13.5px}
   #drop .ico{font-size:24px; display:block; margin-bottom:6px; opacity:.7}
   #drop:hover{border-color:var(--accent); color:var(--accent-d); background:#fbf2e8}
   #drop.hover{border-color:var(--accent); background:#fbeede; color:var(--accent-d)}
   #thumbs{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
-  .thumb{position:relative; width:60px; height:60px; border-radius:10px; overflow:hidden; border:2px solid transparent; cursor:pointer; background:#eee; box-shadow:0 2px 6px rgba(0,0,0,.1)}
+  .thumb{position:relative; width:60px; height:60px; border-radius:10px; overflow:hidden; border:2px solid transparent;
+    cursor:pointer; background:#eee; box-shadow:0 2px 6px rgba(0,0,0,.1); transition:transform .12s}
+  .thumb:hover{transform:translateY(-2px)}
   .thumb.active{border-color:var(--accent); box-shadow:0 4px 10px rgba(189,91,58,.35)}
   .thumb img{width:100%; height:100%; object-fit:cover; display:block}
-  .thumb .x{position:absolute; top:2px; right:2px; width:17px; height:17px; line-height:15px; text-align:center; background:rgba(0,0,0,.6); color:#fff; border-radius:50%; font-size:12px}
+  .thumb .x{position:absolute; top:2px; right:2px; width:17px; height:17px; line-height:15px; text-align:center;
+    background:rgba(0,0,0,.6); color:#fff; border-radius:50%; font-size:12px}
   .thumb .n{position:absolute; bottom:0; left:0; right:0; background:rgba(42,33,24,.62); color:#fff; font-size:10px; text-align:center; font-weight:600}
-
   .foot{margin-top:16px; font-size:12px; color:var(--muted); line-height:1.6; border-top:1px dashed var(--line2); padding-top:14px}
 
-  /* preview stage */
-  .right{padding:0}
-  #stage{
-    border-radius:var(--radius); min-height:calc(100vh - 140px);
-    display:flex; align-items:center; justify-content:center; padding:28px;
+  /* ---- 3D preview stage ---- */
+  #stage{position:relative; overflow:hidden; border-radius:var(--radius); min-height:calc(100vh - 140px);
+    display:flex; align-items:center; justify-content:center; padding:52px; perspective:1700px; perspective-origin:50% 38%;
     background:
-      radial-gradient(900px 500px at 50% 0%, #fbf4e6, transparent 70%),
-      repeating-linear-gradient(45deg,#efe6d4 0 2px,transparent 2px 22px),
-      #ece2cf;
-    box-shadow:inset 0 2px 14px rgba(74,52,30,.12);
-  }
-  canvas{max-width:100%; max-height:calc(100vh - 200px); width:auto; height:auto; border-radius:6px; box-shadow:0 18px 50px -14px rgba(40,25,10,.5), 0 0 0 1px rgba(255,255,255,.6)}
-  .empty{text-align:center; color:var(--muted)}
-  .empty svg{width:72px; height:72px; opacity:.55; margin-bottom:14px}
-  .empty p{margin:0; font-family:"Fraunces",serif; font-style:italic; font-size:16px}
-  .empty span{display:block; font-family:"Hanken Grotesk",sans-serif; font-style:normal; font-size:12.5px; margin-top:4px; opacity:.8}
+      radial-gradient(900px 520px at 50% -5%, #fdf6ea, transparent 70%),
+      repeating-linear-gradient(45deg,#efe6d4 0 2px,transparent 2px 22px), #ece2cf;
+    box-shadow:inset 0 2px 16px rgba(74,52,30,.14)}
+  /* floating dust motes */
+  .motes{position:absolute; inset:0; pointer-events:none; z-index:0}
+  .mote{position:absolute; bottom:-12px; width:6px; height:6px; border-radius:50%;
+    background:radial-gradient(circle,#fff5e0,rgba(255,245,224,0)); opacity:0; animation:drift linear infinite}
+  @keyframes drift{0%{transform:translateY(0) scale(.6); opacity:0}
+    12%{opacity:.8} 88%{opacity:.7} 100%{transform:translateY(-92vh) scale(1.1); opacity:0}}
 
-  @media(max-width:880px){
-    .app{flex-direction:column}
-    .left{width:100%}
-    .right{position:static; width:100%}
-    #stage{min-height:340px}
-  }
+  .book{position:relative; z-index:1; transform-style:preserve-3d; will-change:transform; animation:fadeIn .5s ease both;
+    transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)); transition:transform .2s cubic-bezier(.2,.7,.2,1)}
+  @keyframes fadeIn{from{opacity:0} to{opacity:1}}
+  .leaf{transform-style:preserve-3d; animation:float 7s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0) rotateZ(-.15deg)} 50%{transform:translateY(-7px) rotateZ(.15deg)}}
+  .book canvas{display:block; max-width:100%; max-height:calc(100vh - 240px); width:auto; height:auto;
+    border-radius:4px 11px 11px 4px;
+    box-shadow:
+      -2px 0 0 #efe7d6, -4px 0 0 #e9dfc9, -7px 1px 0 #e0d4ba, -10px 2px 0 #d7cab0,
+      -13px 3px 0 #cdbfa2, -16px 4px 0 #c4b596, -19px 5px 0 #bcac8c,
+      0 38px 68px -22px rgba(40,25,10,.62), 0 0 0 1px rgba(255,255,255,.5)}
+  .glare{position:absolute; inset:0; border-radius:4px 11px 11px 4px; pointer-events:none; mix-blend-mode:screen; opacity:0; transition:opacity .25s}
+
+  .empty{text-align:center; color:var(--muted); z-index:1}
+  .empty svg{width:76px; height:76px; opacity:.55; margin-bottom:14px; animation:float 7s ease-in-out infinite}
+  .empty p{margin:0; font-family:"Fraunces",serif; font-style:italic; font-size:16px}
+  .empty span{display:block; font-style:normal; font-size:12.5px; margin-top:4px; opacity:.8}
+
+  @media(max-width:880px){.app{flex-direction:column}.left{width:100%}.right{position:static; width:100%}#stage{min-height:340px; perspective:1200px}}
 </style>
 </head>
 <body>
 <header>
   <div class="brand">
+    <span class="logo-wrap"><span class="logo"><span class="spine"></span><span class="cover"></span><span class="edge"></span></span></span>
     <span class="mark">Picture&nbsp;Book&nbsp;Captioner<span class="dot">.</span></span>
     <span class="sub">add storybook captions to your art</span>
   </div>
-  <div class="pills">
-    <span class="pill">runs locally</span>
-    <span class="pill">100% free</span>
-    <span class="pill">no tokens</span>
-  </div>
+  <div class="pills"><span class="pill">runs locally</span><span class="pill">100% free</span><span class="pill">no tokens</span></div>
 </header>
 
 <div class="app">
-  <!-- Left: controls -->
   <div class="card left">
     <section>
       <h2><span class="num">1</span> Add images</h2>
@@ -201,7 +204,8 @@
       <div class="slider"><span class="lab">Opacity</span><input id="opacity" type="range" min="0.3" max="1" step="0.05" value="0.96"><span class="val" id="opacityV"></span></div>
 
       <label>Align</label>
-      <select id="align"><option value="center">Center</option><option value="left">Left</option></select>
+      <div class="seg" id="alignSeg"><button data-v="center" class="on">Center</button><button data-v="left">Left</button></div>
+      <select id="align" hidden><option value="center">Center</option><option value="left">Left</option></select>
     </section>
 
     <section>
@@ -225,9 +229,8 @@
     </section>
   </div>
 
-  <!-- Right: preview -->
   <div class="card right">
-    <div id="stage"></div>
+    <div id="stage"><div class="motes" id="motes"></div></div>
   </div>
 </div>
 
@@ -238,12 +241,26 @@ let cur = -1;
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d");
 
+// floating motes
+(() => {
+  const m = $("motes");
+  for (let i = 0; i < 14; i++) {
+    const s = document.createElement("span"); s.className = "mote";
+    const sz = 3 + (i % 4) * 1.5;
+    s.style.left = ((i * 37) % 100) + "%";
+    s.style.width = s.style.height = sz + "px";
+    s.style.animationDuration = (11 + (i % 5) * 3) + "s";
+    s.style.animationDelay = (-i * 1.4) + "s";
+    m.appendChild(s);
+  }
+})();
+
 const EMPTY = `<div class="empty">
   <svg viewBox="0 0 64 64" fill="none" stroke="#bd5b3a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M32 16c-6-4-13-4-19-2v34c6-2 13-2 19 2 6-4 13-4 19-2V14c-6-2-13-2-19 2z"/>
-    <path d="M32 16v34"/></svg>
+    <path d="M32 16c-6-4-13-4-19-2v34c6-2 13-2 19 2 6-4 13-4 19-2V14c-6-2-13-2-19 2z"/><path d="M32 16v34"/></svg>
   <p>Your page appears here</p><span>Add an image to begin</span></div>`;
-function showEmpty(){ $("stage").innerHTML = EMPTY; }
+function showEmpty(){ const st = $("stage"); st.innerHTML = '<div class="motes" id="motes2"></div>' + EMPTY; rebuildMotes($("motes2")); }
+function rebuildMotes(m){ for (let i=0;i<14;i++){const s=document.createElement("span");s.className="mote";const sz=3+(i%4)*1.5;s.style.left=((i*37)%100)+"%";s.style.width=s.style.height=sz+"px";s.style.animationDuration=(11+(i%5)*3)+"s";s.style.animationDelay=(-i*1.4)+"s";m.appendChild(s);} }
 showEmpty();
 
 // ---------- Import ----------
@@ -256,8 +273,7 @@ fileInput.onchange = () => addFiles(fileInput.files);
 
 function addFiles(list) {
   const files = [...list].filter(f => f.type.startsWith("image/"));
-  let pending = files.length;
-  if (!pending) return;
+  let pending = files.length; if (!pending) return;
   files.forEach(f => {
     const img = new Image();
     img.onload = () => { pages.push({ img, name: f.name, text: "" }); if (--pending === 0) afterAdd(); };
@@ -285,17 +301,13 @@ function removePage(i) {
   renderThumbs();
   if (cur >= 0) selectPage(cur); else showEmpty();
 }
-function selectPage(i) {
-  cur = i; if (cur < 0) return;
-  $("text").value = pages[cur].text;
-  renderThumbs();
-  draw();
-}
+function selectPage(i) { cur = i; if (cur < 0) return; $("text").value = pages[cur].text; renderThumbs(); draw(); }
 $("text").oninput = () => { if (cur >= 0) { pages[cur].text = $("text").value; draw(); } };
 
 // ---------- Style controls ----------
-const ctrls = ["font","fontSize","lineGap","bottom","side","pad","radius","opacity","align","textColor","panelColor","borderColor","borderOn","pageOn"];
-ctrls.forEach(id => { const el = $(id); el.oninput = el.onchange = () => { updateVals(); draw(); }; });
+const ctrls = ["font","fontSize","lineGap","bottom","side","pad","radius","opacity","textColor","panelColor","borderColor","borderOn","pageOn"];
+ctrls.forEach(id => { const el = $(id); el.oninput = el.onchange = () => { setFill(el); updateVals(); draw(); }; });
+function setFill(el){ if (el.type !== "range") return; const min=+el.min,max=+el.max,v=+el.value; el.style.setProperty("--p", ((v-min)/(max-min)*100)+"%"); }
 function updateVals() {
   $("fontSizeV").textContent = (+$("fontSize").value).toFixed(1);
   $("lineGapV").textContent = (+$("lineGap").value).toFixed(2);
@@ -305,21 +317,23 @@ function updateVals() {
   $("radiusV").textContent = $("radius").value;
   $("opacityV").textContent = (+$("opacity").value).toFixed(2);
 }
+["fontSize","lineGap","bottom","side","pad","radius","opacity"].forEach(id => setFill($(id)));
 updateVals();
+
+// segmented align
+$("alignSeg").querySelectorAll("button").forEach(b => b.onclick = () => {
+  $("alignSeg").querySelectorAll("button").forEach(x => x.classList.remove("on"));
+  b.classList.add("on"); $("align").value = b.dataset.v; draw();
+});
 
 // ---------- Render ----------
 function roundRect(x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
+  ctx.beginPath(); ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
 }
 function wrapPara(para, maxW) {
-  const words = para.split(" ");
-  const out = []; let curLine = "";
+  const words = para.split(" "); const out = []; let curLine = "";
   for (const w of words) {
     const cand = curLine ? curLine + " " + w : w;
     if (ctx.measureText(cand).width <= maxW) curLine = cand;
@@ -331,99 +345,84 @@ function wrapPara(para, maxW) {
     if (ctx.measureText(ln).width <= maxW) { final.push(ln); continue; }
     let s = ln;
     while (ctx.measureText(s).width > maxW && s.length > 1) {
-      let i = 1;
-      while (i < s.length && ctx.measureText(s.slice(0, i + 1)).width <= maxW) i++;
+      let i = 1; while (i < s.length && ctx.measureText(s.slice(0, i + 1)).width <= maxW) i++;
       final.push(s.slice(0, i)); s = s.slice(i);
     }
     if (s) final.push(s);
   }
   return final.length ? final : [""];
 }
-
 function renderPage(p, index) {
   const W = p.img.naturalWidth, H = p.img.naturalHeight;
-  canvas.width = W; canvas.height = H;
-  ctx.clearRect(0, 0, W, H);
-  ctx.drawImage(p.img, 0, 0, W, H);
-
-  const text = (p.text || "").replace(/\r/g, "");
-  if (!text.trim()) return;
-
+  canvas.width = W; canvas.height = H; ctx.clearRect(0, 0, W, H); ctx.drawImage(p.img, 0, 0, W, H);
+  const text = (p.text || "").replace(/\r/g, ""); if (!text.trim()) return;
   const fontPx = W * (+$("fontSize").value) / 100;
-  const sideM = W * (+$("side").value) / 100;
-  const bottomM = W * (+$("bottom").value) / 100;
-  const padX = W * (+$("pad").value) / 100;
-  const padTop = padX * 0.8, padBottom = padX * 0.85;
-  const radius = W * (+$("radius").value) / 100;
-  const lineGap = fontPx * (+$("lineGap").value);
-  const align = $("align").value;
-
+  const sideM = W * (+$("side").value) / 100, bottomM = W * (+$("bottom").value) / 100;
+  const padX = W * (+$("pad").value) / 100, padTop = padX * 0.8, padBottom = padX * 0.85;
+  const radius = W * (+$("radius").value) / 100, lineGap = fontPx * (+$("lineGap").value), align = $("align").value;
   ctx.font = `${fontPx}px ${$("font").value}`;
-  const panelW = W - 2 * sideM;
-  const maxTextW = panelW - 2 * padX;
-
+  const panelW = W - 2 * sideM, maxTextW = panelW - 2 * padX;
   let lines = [];
-  text.split("\n").forEach(para => {
-    if (para.trim() === "") lines.push("");
-    else lines = lines.concat(wrapPara(para, maxTextW));
-  });
-
+  text.split("\n").forEach(para => { if (para.trim() === "") lines.push(""); else lines = lines.concat(wrapPara(para, maxTextW)); });
   const lineH = fontPx + lineGap;
   const textH = lines.length * fontPx + (lines.length - 1) * lineGap;
-  const panelH = textH + padTop + padBottom;
-  const panelX = sideM, panelY = H - bottomM - panelH;
-
-  ctx.save();
-  ctx.globalAlpha = +$("opacity").value;
-  ctx.shadowColor = "rgba(0,0,0,.28)";
-  ctx.shadowBlur = W * 0.02; ctx.shadowOffsetY = W * 0.004;
-  ctx.fillStyle = $("panelColor").value;
-  roundRect(panelX, panelY, panelW, panelH, radius); ctx.fill();
-  ctx.restore();
-
+  const panelH = textH + padTop + padBottom, panelX = sideM, panelY = H - bottomM - panelH;
+  ctx.save(); ctx.globalAlpha = +$("opacity").value; ctx.shadowColor = "rgba(0,0,0,.28)";
+  ctx.shadowBlur = W * 0.02; ctx.shadowOffsetY = W * 0.004; ctx.fillStyle = $("panelColor").value;
+  roundRect(panelX, panelY, panelW, panelH, radius); ctx.fill(); ctx.restore();
   if ($("borderOn").checked) {
-    ctx.save(); ctx.globalAlpha = +$("opacity").value;
-    ctx.lineWidth = Math.max(1, W * 0.0018);
-    ctx.strokeStyle = $("borderColor").value;
-    roundRect(panelX, panelY, panelW, panelH, radius); ctx.stroke();
-    ctx.restore();
+    ctx.save(); ctx.globalAlpha = +$("opacity").value; ctx.lineWidth = Math.max(1, W * 0.0018);
+    ctx.strokeStyle = $("borderColor").value; roundRect(panelX, panelY, panelW, panelH, radius); ctx.stroke(); ctx.restore();
   }
-
-  ctx.fillStyle = $("textColor").value;
-  ctx.textBaseline = "top";
-  ctx.textAlign = align === "center" ? "center" : "left";
-  const tx = align === "center" ? panelX + panelW / 2 : panelX + padX;
-  let y = panelY + padTop;
+  ctx.fillStyle = $("textColor").value; ctx.textBaseline = "top"; ctx.textAlign = align === "center" ? "center" : "left";
+  const tx = align === "center" ? panelX + panelW / 2 : panelX + padX; let y = panelY + padTop;
   for (const ln of lines) { ctx.fillText(ln, tx, y); y += lineH; }
-
   if ($("pageOn").checked) {
-    const num = String(index + 1);
-    ctx.font = `bold ${fontPx * 0.8}px ${$("font").value}`;
-    ctx.fillStyle = "#a9772f";
+    ctx.font = `bold ${fontPx * 0.8}px ${$("font").value}`; ctx.fillStyle = "#a9772f";
     ctx.textAlign = "right"; ctx.textBaseline = "alphabetic";
-    ctx.fillText(num, panelX + panelW - padX * 0.6, panelY + panelH - padBottom * 0.5);
+    ctx.fillText(String(index + 1), panelX + panelW - padX * 0.6, panelY + panelH - padBottom * 0.5);
   }
 }
 
-function draw() {
-  if (cur < 0) return;
-  renderPage(pages[cur], cur);
+function mountBook() {
   const stage = $("stage");
-  if (stage.firstChild !== canvas) { stage.innerHTML = ""; stage.appendChild(canvas); }
+  let book = stage.querySelector(".book");
+  if (!book) {
+    const motes = stage.querySelector(".motes");
+    stage.innerHTML = ""; if (motes) stage.appendChild(motes);
+    book = document.createElement("div"); book.className = "book";
+    const leaf = document.createElement("div"); leaf.className = "leaf";
+    const glare = document.createElement("div"); glare.className = "glare";
+    leaf.appendChild(canvas); leaf.appendChild(glare); book.appendChild(leaf); stage.appendChild(book);
+  }
 }
+function draw() { if (cur < 0) return; renderPage(pages[cur], cur); mountBook(); }
+
+// ---------- 3D tilt + glare ----------
+(function tilt(){
+  const stage = $("stage"); const MAX = 8;
+  stage.addEventListener("pointermove", e => {
+    const book = stage.querySelector(".book"); if (!book) return;
+    const r = stage.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+    book.style.setProperty("--ry", ((px - 0.5) * MAX * 2).toFixed(2) + "deg");
+    book.style.setProperty("--rx", ((0.5 - py) * MAX * 2).toFixed(2) + "deg");
+    const g = book.querySelector(".glare");
+    if (g) { g.style.opacity = ".6"; g.style.background = `radial-gradient(circle at ${(px*100).toFixed(0)}% ${(py*100).toFixed(0)}%, rgba(255,255,255,.55), rgba(255,255,255,0) 46%)`; }
+  });
+  stage.addEventListener("pointerleave", () => {
+    const book = stage.querySelector(".book"); if (!book) return;
+    book.style.setProperty("--rx", "0deg"); book.style.setProperty("--ry", "0deg");
+    const g = book.querySelector(".glare"); if (g) g.style.opacity = "0";
+  });
+})();
 
 // ---------- Download ----------
 function download(blob, name) {
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob); a.download = name;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
-$("dlOne").onclick = () => {
-  if (cur < 0) return;
-  renderPage(pages[cur], cur);
-  canvas.toBlob(b => download(b, `page${cur + 1}.png`), "image/png");
-};
+$("dlOne").onclick = () => { if (cur < 0) return; renderPage(pages[cur], cur); canvas.toBlob(b => download(b, `page${cur + 1}.png`), "image/png"); };
 $("dlAll").onclick = async () => {
   for (let i = 0; i < pages.length; i++) {
     renderPage(pages[i], i);
@@ -432,7 +431,6 @@ $("dlAll").onclick = async () => {
   if (cur >= 0) draw();
 };
 
-// Redraw once webfonts are ready so Fraunces measures correctly
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (cur >= 0) draw(); });
 </script>
 </body>
