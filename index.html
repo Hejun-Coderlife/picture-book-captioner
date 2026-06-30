@@ -19,6 +19,8 @@
   html,body{height:100%}
   body{margin:0; color:var(--ink); font-family:"Hanken Grotesk",system-ui,sans-serif; overflow-x:hidden;
     background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
+      radial-gradient(1100px 700px at 50% -20%, rgba(255,250,235,.55), transparent 60%),
       radial-gradient(1000px 520px at 85% -10%, #fbf3e0, transparent 60%),
       radial-gradient(840px 470px at -10% 110%, #f6ecd4, transparent 55%),
       var(--paper);
@@ -54,10 +56,13 @@
   .left{width:380px; flex:none; padding:6px 24px 24px; animation:rise .65s cubic-bezier(.2,.7,.2,1) both}
   .right{flex:1; min-width:0; padding:0; animation:rise .65s .07s cubic-bezier(.2,.7,.2,1) both}
   @keyframes rise{from{opacity:0; transform:translateY(15px)} to{opacity:1; transform:none}}
-  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:0 16px 40px -22px rgba(80,50,20,.45)}
+  .card{position:relative; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:0 16px 40px -22px rgba(80,50,20,.45)}
+  .card.left::after{content:""; position:absolute; inset:9px; border:1px solid rgba(189,91,58,.14); border-radius:13px; pointer-events:none}
 
-  section{padding:18px 0}
-  section + section{border-top:1px dashed var(--line2)}
+  section{padding:20px 0; position:relative}
+  section + section{margin-top:4px}
+  section + section::before{content:""; position:absolute; top:-2px; left:7%; right:7%; height:1px; background:linear-gradient(90deg,transparent,var(--line),transparent)}
+  section + section::after{content:"❧"; position:absolute; top:-14px; left:50%; transform:translateX(-50%); font-size:14px; color:var(--honey); background:var(--card); padding:0 9px; line-height:1}
   h2{display:flex; align-items:center; gap:11px; margin:0 0 14px; font-family:"Fraunces",serif; font-size:15px; font-weight:600}
   .num{flex:none; width:24px; height:24px; border-radius:50%; display:grid; place-items:center; font-family:"Fraunces",serif; font-size:13px; color:#fff;
     background:linear-gradient(150deg,#cf6a45,var(--accent-d)); box-shadow:0 3px 8px -2px rgba(164,74,45,.6),inset 0 1px 0 rgba(255,255,255,.35)}
@@ -117,8 +122,10 @@
   #stage{position:relative; overflow:hidden; border-radius:var(--radius); min-height:calc(100vh - 150px); display:flex; align-items:center; justify-content:center; padding:50px;
     background:radial-gradient(900px 500px at 50% 0%,#fbf4e6,transparent 70%), repeating-linear-gradient(45deg,#efe6d4 0 2px,transparent 2px 22px), #ece2cf;
     box-shadow:inset 0 2px 16px rgba(74,52,30,.14)}
-  #stage canvas{display:block; max-width:100%; max-height:calc(100vh - 200px); width:auto; height:auto; border-radius:6px;
-    box-shadow:0 28px 60px -24px rgba(60,40,15,.6), 0 0 0 1px rgba(255,255,255,.6); animation:fadeIn .45s ease both}
+  .plate{position:relative; background:#fffdf6; padding:16px; border-radius:8px; animation:fadeIn .45s ease both;
+    box-shadow:0 32px 66px -26px rgba(60,40,15,.62), 0 2px 8px -3px rgba(60,40,15,.3)}
+  .plate::before{content:""; position:absolute; inset:8px; border:1px solid rgba(199,154,85,.55); border-radius:4px; pointer-events:none; z-index:1}
+  .plate canvas{display:block; max-width:100%; max-height:calc(100vh - 232px); width:auto; height:auto; border-radius:2px; box-shadow:0 0 0 1px rgba(60,40,15,.08)}
   @keyframes fadeIn{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
   .empty{text-align:center; color:var(--muted)}
   .empty svg{width:74px; height:74px; opacity:.6; margin-bottom:14px}
@@ -298,7 +305,7 @@ function renderPage(p,index){
   for (const ln of lines){ ctx.fillText(ln,tx,y); y+=lineH; }
   if ($("pageOn").checked){ ctx.font=`bold ${fontPx*0.8}px ${$("font").value}`; ctx.fillStyle="#a9772f"; ctx.textAlign="right"; ctx.textBaseline="alphabetic"; ctx.fillText(String(index+1), panelX+panelW-padX*0.6, panelY+panelH-padBottom*0.5); }
 }
-function mountCanvas(){ const stage=$("stage"); if (stage.firstChild !== canvas){ stage.innerHTML=""; stage.appendChild(canvas); } }
+function mountCanvas(){ const stage=$("stage"); if (!stage.querySelector(".plate")){ stage.innerHTML=""; const pl=document.createElement("div"); pl.className="plate"; pl.appendChild(canvas); stage.appendChild(pl); } }
 function draw(){ if (cur<0) return; renderPage(pages[cur],cur); mountCanvas(); }
 
 function download(blob,name){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
