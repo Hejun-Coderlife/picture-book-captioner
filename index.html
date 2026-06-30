@@ -3,115 +3,248 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Picture Book Captioner (local · free · no tokens)</title>
+<title>Picture Book Captioner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; }
-  body { margin: 0; font: 14px/1.5 system-ui, sans-serif; color: #222; background: #f3f4f6; }
-  header { background: #1f2937; color: #fff; padding: 12px 18px; }
-  header h1 { margin: 0; font-size: 16px; }
-  header small { color: #9ca3af; }
-  .app { display: flex; gap: 14px; padding: 14px; align-items: flex-start; }
-  .panel { background: #fff; border-radius: 10px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-  .left { width: 340px; flex: none; }
-  .right { flex: 1; min-width: 0; position: sticky; top: 14px; }
-  h2 { font-size: 13px; color: #6b7280; margin: 16px 0 8px; }
-  h2:first-child { margin-top: 0; }
-  label { display: block; font-size: 12px; color: #6b7280; margin: 10px 0 3px; }
-  textarea, input[type=text], select { width: 100%; padding: 7px 9px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; font-family: inherit; }
-  textarea { min-height: 88px; resize: vertical; }
-  .row { display: flex; align-items: center; gap: 8px; }
-  .row label { margin: 0; flex: none; width: 72px; }
-  input[type=range] { flex: 1; }
-  .val { width: 42px; text-align: right; font-variant-numeric: tabular-nums; color: #374151; }
-  .colors { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .colors .c { display: flex; align-items: center; gap: 6px; }
-  .colors input[type=color] { width: 30px; height: 26px; padding: 0; border: 1px solid #d1d5db; border-radius: 5px; }
-  button { padding: 9px 12px; border: 0; border-radius: 7px; font-size: 13px; cursor: pointer; }
-  .primary { background: #2563eb; color: #fff; }
-  .ghost { background: #e5e7eb; color: #1f2937; }
-  .btns { display: flex; gap: 8px; margin-top: 12px; }
-  .btns button { flex: 1; }
-  #drop { border: 2px dashed #cbd5e1; border-radius: 10px; padding: 18px; text-align: center; color: #6b7280; cursor: pointer; background: #fafafa; }
-  #drop.hover { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
-  #thumbs { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
-  .thumb { position: relative; width: 56px; height: 56px; border-radius: 6px; overflow: hidden; border: 2px solid transparent; cursor: pointer; background: #eee; }
-  .thumb.active { border-color: #2563eb; }
-  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .thumb .x { position: absolute; top: 1px; right: 1px; width: 16px; height: 16px; line-height: 14px; text-align: center; background: rgba(0,0,0,.6); color: #fff; border-radius: 50%; font-size: 11px; }
-  .thumb .n { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,.55); color: #fff; font-size: 10px; text-align: center; }
-  #stage { background: #e5e7eb; border-radius: 8px; padding: 12px; text-align: center; min-height: 200px; display: flex; align-items: center; justify-content: center; }
-  canvas { max-width: 100%; max-height: calc(100vh - 150px); width: auto; height: auto; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,.15); }
-  .muted { color: #9ca3af; font-size: 12px; }
-  .toggle { display: flex; align-items: center; gap: 6px; margin: 8px 0; }
+  :root{
+    --paper:#f4eede;
+    --card:#fffdf7;
+    --ink:#2a2118;
+    --muted:#8c7f6c;
+    --line:#e7ddca;
+    --line2:#efe7d6;
+    --accent:#bd5b3a;       /* terracotta */
+    --accent-d:#a44a2d;
+    --honey:#dca64a;
+    --field:#fbf7ee;
+    --shadow:0 10px 30px -12px rgba(74,52,30,.28);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; color:var(--ink);
+    font-family:"Hanken Grotesk", system-ui, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, #fbf3e3 0%, rgba(251,243,227,0) 60%),
+      radial-gradient(900px 500px at -10% 110%, #f6ecd8 0%, rgba(246,236,216,0) 55%),
+      var(--paper);
+    background-attachment:fixed;
+  }
+  ::selection{background:rgba(189,91,58,.18)}
+
+  /* ---- header ---- */
+  header{
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    padding:18px 28px; border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#fffdf8,#fbf4e6);
+  }
+  .brand{display:flex; align-items:baseline; gap:12px}
+  .mark{
+    font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:26px; letter-spacing:.2px;
+    color:var(--ink); line-height:1;
+  }
+  .mark .dot{color:var(--accent)}
+  .sub{font-style:italic; font-family:"Fraunces",serif; color:var(--muted); font-size:14px}
+  .pills{display:flex; gap:8px; margin-left:auto; flex-wrap:wrap}
+  .pill{
+    font-size:12px; font-weight:600; color:var(--accent-d);
+    background:rgba(189,91,58,.09); border:1px solid rgba(189,91,58,.22);
+    padding:5px 11px; border-radius:999px;
+  }
+
+  /* ---- layout ---- */
+  .app{display:flex; gap:22px; padding:24px 28px; align-items:flex-start; max-width:1500px; margin:0 auto}
+  .left{width:372px; flex:none}
+  .right{flex:1; min-width:0; position:sticky; top:24px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow)}
+  .left{padding:6px 22px 22px}
+
+  /* ---- sections ---- */
+  section{padding:18px 0; border-top:1px dashed var(--line2)}
+  section:first-of-type{border-top:0}
+  h2{display:flex; align-items:center; gap:10px; margin:0 0 14px; font-size:15px; font-weight:600; color:var(--ink); font-family:"Fraunces",serif}
+  .num{
+    flex:none; width:24px; height:24px; border-radius:50%;
+    background:var(--accent); color:#fff; font:600 13px/24px "Hanken Grotesk",sans-serif;
+    text-align:center; box-shadow:0 2px 6px rgba(189,91,58,.35);
+  }
+
+  label{display:block; font-size:12px; color:var(--muted); margin:12px 0 5px; font-weight:600; letter-spacing:.2px}
+  textarea,select{
+    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:11px;
+    font-size:14px; font-family:inherit; color:var(--ink); background:var(--field);
+    transition:border-color .15s, box-shadow .15s;
+  }
+  textarea{min-height:104px; resize:vertical; line-height:1.55}
+  textarea:focus,select:focus{outline:0; border-color:var(--accent); box-shadow:0 0 0 3px rgba(189,91,58,.14)}
+  select{appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M3 4.5L6 8l3-3.5' fill='none' stroke='%238c7f6c' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; cursor:pointer}
+
+  /* sliders */
+  .slider{display:flex; align-items:center; gap:12px; margin:9px 0}
+  .slider .lab{flex:none; width:74px; font-size:12.5px; color:var(--muted); font-weight:600}
+  .slider input[type=range]{flex:1; accent-color:var(--accent); height:4px; cursor:pointer}
+  .slider .val{flex:none; width:46px; text-align:right; font-variant-numeric:tabular-nums; font-size:13px; color:var(--ink); font-weight:600}
+
+  /* colors */
+  .colors{display:grid; grid-template-columns:1fr 1fr; gap:12px 14px; margin-top:6px}
+  .swatch{display:flex; align-items:center; gap:9px; font-size:13px; color:var(--ink); cursor:pointer}
+  input[type=color]{
+    width:30px; height:30px; padding:0; border:2px solid #fff; border-radius:50%;
+    box-shadow:0 0 0 1px var(--line), 0 2px 5px rgba(0,0,0,.12); cursor:pointer; background:none;
+  }
+  input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+  input[type=color]::-webkit-color-swatch{border:0; border-radius:50%}
+  .check{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink); cursor:pointer}
+  input[type=checkbox]{accent-color:var(--accent); width:16px; height:16px; cursor:pointer}
+
+  /* buttons */
+  .btns{display:flex; gap:10px; margin-top:18px}
+  button{font-family:inherit; font-weight:600; font-size:14px; border-radius:12px; cursor:pointer; transition:transform .08s, box-shadow .15s, background .15s}
+  button:active{transform:translateY(1px)}
+  .primary{flex:1; padding:12px; border:0; color:#fff; background:linear-gradient(180deg,var(--accent),var(--accent-d)); box-shadow:0 6px 16px -6px rgba(164,74,45,.7)}
+  .primary:hover{box-shadow:0 9px 20px -6px rgba(164,74,45,.8)}
+  .ghost{flex:1; padding:12px; border:1px solid var(--line); background:#fff; color:var(--ink)}
+  .ghost:hover{border-color:var(--accent); color:var(--accent-d)}
+
+  /* drop zone + thumbs */
+  #drop{
+    border:1.5px dashed #d8ccb3; border-radius:13px; padding:24px 16px; text-align:center;
+    color:var(--muted); cursor:pointer; background:var(--field); transition:.15s; font-size:13.5px;
+  }
+  #drop .ico{font-size:24px; display:block; margin-bottom:6px; opacity:.7}
+  #drop:hover{border-color:var(--accent); color:var(--accent-d); background:#fbf2e8}
+  #drop.hover{border-color:var(--accent); background:#fbeede; color:var(--accent-d)}
+  #thumbs{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
+  .thumb{position:relative; width:60px; height:60px; border-radius:10px; overflow:hidden; border:2px solid transparent; cursor:pointer; background:#eee; box-shadow:0 2px 6px rgba(0,0,0,.1)}
+  .thumb.active{border-color:var(--accent); box-shadow:0 4px 10px rgba(189,91,58,.35)}
+  .thumb img{width:100%; height:100%; object-fit:cover; display:block}
+  .thumb .x{position:absolute; top:2px; right:2px; width:17px; height:17px; line-height:15px; text-align:center; background:rgba(0,0,0,.6); color:#fff; border-radius:50%; font-size:12px}
+  .thumb .n{position:absolute; bottom:0; left:0; right:0; background:rgba(42,33,24,.62); color:#fff; font-size:10px; text-align:center; font-weight:600}
+
+  .foot{margin-top:16px; font-size:12px; color:var(--muted); line-height:1.6; border-top:1px dashed var(--line2); padding-top:14px}
+
+  /* preview stage */
+  .right{padding:0}
+  #stage{
+    border-radius:var(--radius); min-height:calc(100vh - 140px);
+    display:flex; align-items:center; justify-content:center; padding:28px;
+    background:
+      radial-gradient(900px 500px at 50% 0%, #fbf4e6, transparent 70%),
+      repeating-linear-gradient(45deg,#efe6d4 0 2px,transparent 2px 22px),
+      #ece2cf;
+    box-shadow:inset 0 2px 14px rgba(74,52,30,.12);
+  }
+  canvas{max-width:100%; max-height:calc(100vh - 200px); width:auto; height:auto; border-radius:6px; box-shadow:0 18px 50px -14px rgba(40,25,10,.5), 0 0 0 1px rgba(255,255,255,.6)}
+  .empty{text-align:center; color:var(--muted)}
+  .empty svg{width:72px; height:72px; opacity:.55; margin-bottom:14px}
+  .empty p{margin:0; font-family:"Fraunces",serif; font-style:italic; font-size:16px}
+  .empty span{display:block; font-family:"Hanken Grotesk",sans-serif; font-style:normal; font-size:12.5px; margin-top:4px; opacity:.8}
+
+  @media(max-width:880px){
+    .app{flex-direction:column}
+    .left{width:100%}
+    .right{position:static; width:100%}
+    #stage{min-height:340px}
+  }
 </style>
 </head>
 <body>
 <header>
-  <h1>Picture Book Captioner <small>· runs locally · 100% free · uses no tokens</small></h1>
+  <div class="brand">
+    <span class="mark">Picture&nbsp;Book&nbsp;Captioner<span class="dot">.</span></span>
+    <span class="sub">add storybook captions to your art</span>
+  </div>
+  <div class="pills">
+    <span class="pill">runs locally</span>
+    <span class="pill">100% free</span>
+    <span class="pill">no tokens</span>
+  </div>
 </header>
 
 <div class="app">
   <!-- Left: controls -->
-  <div class="panel left">
-    <h2>1. Add images</h2>
-    <div id="drop">Drag images here, or click to choose (multiple OK)</div>
-    <input id="file" type="file" accept="image/*" multiple hidden>
-    <div id="thumbs"></div>
+  <div class="card left">
+    <section>
+      <h2><span class="num">1</span> Add images</h2>
+      <div id="drop"><span class="ico">🖼️</span>Drag images here, or click to choose<br><span style="opacity:.7">multiple files welcome</span></div>
+      <input id="file" type="file" accept="image/*" multiple hidden>
+      <div id="thumbs"></div>
+    </section>
 
-    <h2>2. Text for this page (one line per sentence)</h2>
-    <textarea id="text" placeholder="When Albert was a boy, he saw a compass.&#10;The needle moved by itself.&#10;Albert wondered what was pulling it."></textarea>
+    <section>
+      <h2><span class="num">2</span> Text for this page</h2>
+      <textarea id="text" placeholder="When Albert was a boy, he saw a compass.&#10;The needle moved by itself.&#10;Albert wondered what was pulling it."></textarea>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:5px">One line per sentence · long lines wrap automatically</div>
+    </section>
 
-    <h2>3. Layout (applies to all pages)</h2>
-    <label>Font</label>
-    <select id="font">
-      <option value='Georgia, "Times New Roman", serif'>Georgia (serif, default)</option>
-      <option value='"Times New Roman", serif'>Times New Roman</option>
-      <option value='Helvetica, Arial, sans-serif'>Helvetica / Arial (sans)</option>
-      <option value='Verdana, sans-serif'>Verdana</option>
-      <option value='"Comic Sans MS", "Chalkboard SE", cursive'>Comic Sans (playful)</option>
-    </select>
+    <section>
+      <h2><span class="num">3</span> Layout</h2>
+      <label>Font</label>
+      <select id="font">
+        <option value='"Fraunces", Georgia, serif'>Fraunces (storybook serif)</option>
+        <option value='Georgia, "Times New Roman", serif'>Georgia (serif)</option>
+        <option value='"Times New Roman", serif'>Times New Roman</option>
+        <option value='Helvetica, Arial, sans-serif'>Helvetica / Arial</option>
+        <option value='Verdana, sans-serif'>Verdana</option>
+        <option value='"Comic Sans MS", "Chalkboard SE", cursive'>Comic Sans (playful)</option>
+      </select>
 
-    <div class="row"><label>Size</label><input id="fontSize" type="range" min="1.5" max="8" step="0.1" value="3.7"><span class="val" id="fontSizeV"></span></div>
-    <div class="row"><label>Line gap</label><input id="lineGap" type="range" min="0" max="1.2" step="0.05" value="0.45"><span class="val" id="lineGapV"></span></div>
-    <div class="row"><label>Bottom</label><input id="bottom" type="range" min="0" max="15" step="0.5" value="4.7"><span class="val" id="bottomV"></span></div>
-    <div class="row"><label>Sides</label><input id="side" type="range" min="0" max="15" step="0.5" value="4.7"><span class="val" id="sideV"></span></div>
-    <div class="row"><label>Padding</label><input id="pad" type="range" min="1" max="10" step="0.5" value="5"><span class="val" id="padV"></span></div>
-    <div class="row"><label>Corner</label><input id="radius" type="range" min="0" max="8" step="0.5" value="3"><span class="val" id="radiusV"></span></div>
-    <div class="row"><label>Opacity</label><input id="opacity" type="range" min="0.3" max="1" step="0.05" value="0.96"><span class="val" id="opacityV"></span></div>
+      <div class="slider"><span class="lab">Size</span><input id="fontSize" type="range" min="1.5" max="8" step="0.1" value="3.7"><span class="val" id="fontSizeV"></span></div>
+      <div class="slider"><span class="lab">Line gap</span><input id="lineGap" type="range" min="0" max="1.2" step="0.05" value="0.45"><span class="val" id="lineGapV"></span></div>
+      <div class="slider"><span class="lab">Bottom</span><input id="bottom" type="range" min="0" max="15" step="0.5" value="4.7"><span class="val" id="bottomV"></span></div>
+      <div class="slider"><span class="lab">Sides</span><input id="side" type="range" min="0" max="15" step="0.5" value="4.7"><span class="val" id="sideV"></span></div>
+      <div class="slider"><span class="lab">Padding</span><input id="pad" type="range" min="1" max="10" step="0.5" value="5"><span class="val" id="padV"></span></div>
+      <div class="slider"><span class="lab">Corner</span><input id="radius" type="range" min="0" max="8" step="0.5" value="3"><span class="val" id="radiusV"></span></div>
+      <div class="slider"><span class="lab">Opacity</span><input id="opacity" type="range" min="0.3" max="1" step="0.05" value="0.96"><span class="val" id="opacityV"></span></div>
 
-    <label>Align</label>
-    <select id="align"><option value="center">Center</option><option value="left">Left</option></select>
+      <label>Align</label>
+      <select id="align"><option value="center">Center</option><option value="left">Left</option></select>
+    </section>
 
-    <h2>4. Colors</h2>
-    <div class="colors">
-      <div class="c"><input type="color" id="textColor" value="#2b2b2b"><span>Text</span></div>
-      <div class="c"><input type="color" id="panelColor" value="#fbfaf6"><span>Panel</span></div>
-      <div class="c"><input type="color" id="borderColor" value="#c9a227"><span>Border</span></div>
-      <div class="c"><label class="toggle" style="margin:0"><input type="checkbox" id="borderOn" checked> Show border</label></div>
-    </div>
+    <section>
+      <h2><span class="num">4</span> Colors</h2>
+      <div class="colors">
+        <label class="swatch"><input type="color" id="textColor" value="#2b2b2b"> Text</label>
+        <label class="swatch"><input type="color" id="panelColor" value="#fbfaf6"> Panel</label>
+        <label class="swatch"><input type="color" id="borderColor" value="#c9a227"> Border</label>
+        <label class="check"><input type="checkbox" id="borderOn" checked> Show border</label>
+      </div>
+    </section>
 
-    <h2>5. Page number</h2>
-    <div class="toggle"><input type="checkbox" id="pageOn" checked> Show page number bottom-right (1, 2, 3 … by import order)</div>
-
-    <div class="btns">
-      <button class="primary" id="dlOne">Download this page</button>
-      <button class="ghost" id="dlAll">Download all</button>
-    </div>
-    <p class="muted">Everything runs locally on your computer — images are never uploaded, no internet, zero cost. Make as many books as you like, for free.</p>
+    <section>
+      <h2><span class="num">5</span> Page number</h2>
+      <label class="check"><input type="checkbox" id="pageOn" checked> Show number bottom-right (1, 2, 3 … by import order)</label>
+      <div class="btns">
+        <button class="primary" id="dlOne">Download this page</button>
+        <button class="ghost" id="dlAll">Download all</button>
+      </div>
+      <p class="foot">Everything runs locally in your browser — images are never uploaded, nothing leaves your computer, zero cost. Make as many books as you like.</p>
+    </section>
   </div>
 
   <!-- Right: preview -->
-  <div class="panel right">
-    <div id="stage"><span class="muted">Preview appears here after you add images</span></div>
+  <div class="card right">
+    <div id="stage"></div>
   </div>
 </div>
 
 <script>
 const $ = id => document.getElementById(id);
-const pages = [];           // {img, name, text}
+const pages = [];
 let cur = -1;
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d");
+
+const EMPTY = `<div class="empty">
+  <svg viewBox="0 0 64 64" fill="none" stroke="#bd5b3a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 16c-6-4-13-4-19-2v34c6-2 13-2 19 2 6-4 13-4 19-2V14c-6-2-13-2-19 2z"/>
+    <path d="M32 16v34"/></svg>
+  <p>Your page appears here</p><span>Add an image to begin</span></div>`;
+function showEmpty(){ $("stage").innerHTML = EMPTY; }
+showEmpty();
 
 // ---------- Import ----------
 const drop = $("drop"), fileInput = $("file");
@@ -124,6 +257,7 @@ fileInput.onchange = () => addFiles(fileInput.files);
 function addFiles(list) {
   const files = [...list].filter(f => f.type.startsWith("image/"));
   let pending = files.length;
+  if (!pending) return;
   files.forEach(f => {
     const img = new Image();
     img.onload = () => { pages.push({ img, name: f.name, text: "" }); if (--pending === 0) afterAdd(); };
@@ -149,7 +283,7 @@ function removePage(i) {
   pages.splice(i, 1);
   if (cur >= pages.length) cur = pages.length - 1;
   renderThumbs();
-  if (cur >= 0) selectPage(cur); else { $("stage").innerHTML = '<span class="muted">Preview appears here after you add images</span>'; }
+  if (cur >= 0) selectPage(cur); else showEmpty();
 }
 function selectPage(i) {
   cur = i; if (cur < 0) return;
@@ -192,7 +326,6 @@ function wrapPara(para, maxW) {
     else { if (curLine) out.push(curLine); curLine = w; }
   }
   if (curLine) out.push(curLine);
-  // Break overly long lines (CJK without spaces / very long words) by character
   const final = [];
   for (const ln of out) {
     if (ctx.measureText(ln).width <= maxW) { final.push(ln); continue; }
@@ -240,7 +373,6 @@ function renderPage(p, index) {
   const panelH = textH + padTop + padBottom;
   const panelX = sideM, panelY = H - bottomM - panelH;
 
-  // Panel
   ctx.save();
   ctx.globalAlpha = +$("opacity").value;
   ctx.shadowColor = "rgba(0,0,0,.28)";
@@ -257,7 +389,6 @@ function renderPage(p, index) {
     ctx.restore();
   }
 
-  // Text
   ctx.fillStyle = $("textColor").value;
   ctx.textBaseline = "top";
   ctx.textAlign = align === "center" ? "center" : "left";
@@ -265,7 +396,6 @@ function renderPage(p, index) {
   let y = panelY + padTop;
   for (const ln of lines) { ctx.fillText(ln, tx, y); y += lineH; }
 
-  // Page number
   if ($("pageOn").checked) {
     const num = String(index + 1);
     ctx.font = `bold ${fontPx * 0.8}px ${$("font").value}`;
@@ -301,6 +431,9 @@ $("dlAll").onclick = async () => {
   }
   if (cur >= 0) draw();
 };
+
+// Redraw once webfonts are ready so Fraunces measures correctly
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (cur >= 0) draw(); });
 </script>
 </body>
 </html>
