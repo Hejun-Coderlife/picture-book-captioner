@@ -67,6 +67,10 @@
   h2{display:flex; align-items:center; gap:11px; margin:0 0 14px; font-family:"Fraunces",serif; font-size:15px; font-weight:600}
   .num{flex:none; width:24px; height:24px; border-radius:50%; display:grid; place-items:center; font-family:"Fraunces",serif; font-size:13px; color:#fff;
     background:linear-gradient(150deg,#cf6a45,var(--accent-d)); box-shadow:0 3px 8px -2px rgba(164,74,45,.6),inset 0 1px 0 rgba(255,255,255,.35)}
+  .scroll section:nth-of-type(2) .num{background:linear-gradient(150deg,#93aa6c,#6f8c52); box-shadow:0 3px 8px -2px rgba(111,140,82,.6),inset 0 1px 0 rgba(255,255,255,.35)}
+  .scroll section:nth-of-type(3) .num{background:linear-gradient(150deg,#5fb0a6,#3f8079); box-shadow:0 3px 8px -2px rgba(63,128,121,.6),inset 0 1px 0 rgba(255,255,255,.35)}
+  .scroll section:nth-of-type(4) .num{background:linear-gradient(150deg,#aa7290,#855066); box-shadow:0 3px 8px -2px rgba(133,80,102,.6),inset 0 1px 0 rgba(255,255,255,.35)}
+  .scroll section:nth-of-type(5) .num{background:linear-gradient(150deg,#d6a64f,#b9863a); box-shadow:0 3px 8px -2px rgba(185,134,58,.6),inset 0 1px 0 rgba(255,255,255,.35)}
 
   label{display:block; font-size:11.5px; color:var(--muted); margin:12px 0 6px; font-weight:600; letter-spacing:.3px; text-transform:uppercase}
   textarea,select{width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:var(--radius-sm); font-size:14px; font-family:inherit; color:var(--ink);
@@ -123,10 +127,8 @@
   #stage{position:relative; overflow:hidden; height:100%; border-radius:var(--radius); display:flex; align-items:center; justify-content:center; padding:46px;
     background:radial-gradient(900px 500px at 50% 0%,#fbf4e6,transparent 70%), repeating-linear-gradient(45deg,#efe6d4 0 2px,transparent 2px 22px), #ece2cf;
     box-shadow:inset 0 2px 16px rgba(74,52,30,.14)}
-  .plate{position:relative; background:#fffdf6; padding:16px; border-radius:8px; animation:fadeIn .45s ease both;
-    box-shadow:0 32px 66px -26px rgba(60,40,15,.62), 0 2px 8px -3px rgba(60,40,15,.3)}
-  .plate::before{content:""; position:absolute; inset:8px; border:1px solid rgba(199,154,85,.55); border-radius:4px; pointer-events:none; z-index:1}
-  .plate canvas{display:block; max-width:100%; max-height:calc(100vh - 244px); width:auto; height:auto; border-radius:2px; box-shadow:0 0 0 1px rgba(60,40,15,.08)}
+  #stage canvas{display:block; max-width:100%; max-height:calc(100vh - 200px); width:auto; height:auto; border-radius:4px;
+    box-shadow:0 28px 60px -24px rgba(60,40,15,.55); animation:fadeIn .45s ease both}
   @keyframes fadeIn{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
   .empty{text-align:center; color:var(--muted)}
   .empty svg{width:74px; height:74px; opacity:.6; margin-bottom:14px}
@@ -231,11 +233,11 @@ function initScene(){
   const cv=document.createElement("canvas"); cv.width=cv.height=128; const g=cv.getContext("2d");
   const rg=g.createRadialGradient(64,64,0,64,64,64); rg.addColorStop(0,"rgba(255,255,255,1)"); rg.addColorStop(.25,"rgba(255,255,255,.82)"); rg.addColorStop(1,"rgba(255,255,255,0)");
   g.fillStyle=rg; g.fillRect(0,0,128,128); const tex=new THREE.CanvasTexture(cv);
-  const pal=[0xffe6c2,0xffd9b0,0xf6c9a0,0xe7b894,0xfff2d8,0xffffff], orbs=[];
+  const pal=[0xffe6c2,0xf6c9a0,0x9fc08f,0x6fb7ad,0xcf94ad,0x8fb3d6,0xe8c66a,0xfff2d8], orbs=[];
   function add(n,za,zb,sa,sb,oa,ob){for(let i=0;i<n;i++){const m=new THREE.SpriteMaterial({map:tex,color:pal[(Math.random()*pal.length)|0],transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});const s=new THREE.Sprite(m);const z=za+Math.random()*(zb-za);s.position.set((Math.random()-.5)*54,(Math.random()-.5)*34,z);const k=sa+Math.random()*(sb-sa)+(-z)*.05;s.scale.set(k,k,1);s.userData={b:oa+Math.random()*(ob-oa),ph:Math.random()*6.28,tw:.25+Math.random()*.5,dr:.12+Math.random()*.4,x:s.position.x,y:s.position.y};scene.add(s);orbs.push(s);}}
   add(46,-26,-2,.8,3,.12,.4); add(7,-40,-28,7,13,.05,.13);
 
-  const pPal=[0xfff7ea,0xf3dcc0,0xe8c9a6,0xf6e3c8], leaves=[];
+  const pPal=[0xfff7ea,0xdde7c8,0xc8e0db,0xecd2dc,0xd9e2ef,0xf3dcc0], leaves=[];
   for(let i=0;i<9;i++){
     const m=new THREE.MeshStandardMaterial({color:pPal[i%pPal.length],roughness:.9,metalness:0,transparent:true,opacity:0.20,side:THREE.DoubleSide});
     const mesh=new THREE.Mesh(new THREE.BoxGeometry(2.0,2.7,0.05),m);
@@ -346,7 +348,7 @@ function renderPage(p,index){
   for (const ln of lines){ ctx.fillText(ln,tx,y); y+=lineH; }
   if ($("pageOn").checked){ ctx.font=`bold ${fontPx*0.8}px ${$("font").value}`; ctx.fillStyle="#a9772f"; ctx.textAlign="right"; ctx.textBaseline="alphabetic"; ctx.fillText(String(index+1), panelX+panelW-padX*0.6, panelY+panelH-padBottom*0.5); }
 }
-function mountCanvas(){ const stage=$("stage"); if (!stage.querySelector(".plate")){ stage.innerHTML=""; const pl=document.createElement("div"); pl.className="plate"; pl.appendChild(canvas); stage.appendChild(pl); } }
+function mountCanvas(){ const stage=$("stage"); if (stage.firstChild !== canvas){ stage.innerHTML=""; stage.appendChild(canvas); } }
 function draw(){ if (cur<0) return; renderPage(pages[cur],cur); mountCanvas(); }
 
 function download(blob,name){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
